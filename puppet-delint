@@ -1,5 +1,4 @@
 #!/bin/bash
-echo $(dirname $0)
 
 function trimws() {
     # Remove all the dirty nasty dangling whitespace
