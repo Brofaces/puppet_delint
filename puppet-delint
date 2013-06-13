@@ -6,7 +6,7 @@ function trimws() {
 }
 
 LINT=`mktemp`
-find . -name '*.pp' | xargs puppet-lint --with-filename > $LINT
+find $1 -name '*.pp' | xargs puppet-lint --with-filename > $LINT
 
 function bad_file() {
     echo $1
@@ -33,5 +33,11 @@ do
 	    echo "Replacement:"
 	    sed -r -i "${BADLINE}s/([0-9]{3,4})/\'\1'/" $BADFILE
 	    ;;
+    quotes)
+        echo "Original:"
+	    sed -n "${BADLINE}" $BADFILE
+	    echo "Replacement:"
+        sed -r -i "${BADLINE}s/\"(.*?)\"/'\1'/" $BADFILE
+        ;;
     esac
 done < $LINT
