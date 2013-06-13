@@ -1,0 +1,37 @@
+#!/bin/bash
+
+function trimws() {
+    # Remove all the dirty nasty dangling whitespace
+    sed -i -r "s/(\s+)$//" `find . -type f | grep -v git | xargs`
+}
+
+LINT=`mktemp`
+find . -name '*.pp' | xargs puppet-lint --with-filename > $LINT
+
+function bad_file() {
+    echo $1
+}
+
+function line_no() {
+    echo "$@" | awk '{print $NF }'
+}
+
+function classify_lint() {
+    echo "$@" | awk -f ~/bin/puppet-delint.awk
+}
+
+while read lint
+do
+    BADFILE=`bad_file ${lint}`
+    BADLINE=`line_no ${lint}`
+    LINTTYPE=`classify_lint ${lint}`
+    echo "$BADFILE:$BADLINE - $LINTTYPE"
+    case $LINTTYPE in
+	filemode)
+	    echo "Original:"
+	    sed -n "${BADLINE}p" $BADFILE
+	    echo "Replacement:"
+	    sed -r -i "${BADLINE}s/([0-9]{3,4})/\'\1'/" $BADFILE
+	    ;;
+    esac
+done < $LINT
