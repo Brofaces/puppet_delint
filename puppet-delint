@@ -1,4 +1,5 @@
 #!/bin/bash
+echo $(dirname $0)
 
 function trimws() {
     # Remove all the dirty nasty dangling whitespace
@@ -17,7 +18,7 @@ function line_no() {
 }
 
 function classify_lint() {
-    echo "$@" | awk -f ~/bin/puppet-delint.awk
+    echo "$@" | awk -f $(dirname $0)/puppet-delint.awk
 }
 
 while read lint
